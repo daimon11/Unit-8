@@ -6,41 +6,22 @@ const cart = {
     this.totalPrice += this.calculateItemPrice()
     return this.totalPrice;
   },
-  add(productName, priceProduct, quantityProduct) {
-    let product = {};
-    priceProduct = +priceProduct;
-    if (quantityProduct === undefined || quantityProduct === '' || quantityProduct === null || Number.isNaN(quantityProduct)) {
-      product = {
-        productName: productName,
-        priceProduct: +priceProduct,
-        quantityProduct: 1,
-      };
-      this.count += 1;
-    } else {
-      product = {
-        productName: productName,
-        priceProduct: +priceProduct,
-        quantityProduct: +quantityProduct,
-      };
-      this.count += quantityProduct;
-    }
+  add(productName, priceProduct, quantityProduct = 1) {
+    const product = {
+      productName: productName,
+      priceProduct: priceProduct,
+      quantityProduct: quantityProduct,
+    };
     this.items.push(product);
   },
-  increaseCount(number) {
-    if (number === undefined || number === '' || number === null || Number.isNaN(number)) {
-      this.count += 0;
-    } else {
-      this.count += number;
-      this.items[cart.items.length - 1].quantityProduct += number;
-    }
+  increaseCount(number = 0) {
+    this.items[cart.items.length - 1].quantityProduct += number;
+    this.count = this.items.reduce((acc, {quantityProduct}) => acc + quantityProduct, 0);
     return this.count;
   },
   calculateItemPrice() {
-    let rest = [];
-    for (let i = 0; i < this.items.length; i++) {
-      rest[i] = [this.items[i].priceProduct * this.items[i].quantityProduct];
-    }
-    return (rest.flat().reduce((sum, current) => sum + current, 0));
+    return this.items.reduce((acc, {priceProduct, quantityProduct}) =>
+      acc + priceProduct * quantityProduct, 0);
   },
   clear() {
     this.items = [];
@@ -53,13 +34,13 @@ const cart = {
   },
 }
 
-cart.add('Пиво', 100, 3);
-cart.add('Cидр', 75);
-cart.increaseCount(7);
-cart.add('Квас', 80, 2);
-console.log('Предварительная сумма товаров = ' + cart.calculateItemPrice());
+cart.add('Пиво', 100);
+cart.add('Квас', 50, 4);
+cart.add('Сидр', 80);
+cart.increaseCount(2);
+cart.add('Пуаре', 180, 4);
+cart.increaseCount(8);
+console.log(cart.calculateItemPrice());
 console.log(cart.items);
-console.log('Общее количество товаров в корзине = ' + cart.count);
-console.log('Количество товаров последнего добавленного товара = ' + cart.items[cart.items.length - 1].quantityProduct);
-console.log('Общая сумма товаров = ' + cart.getTotalPrice());
-
+console.log(cart.getTotalPrice());
+console.log(cart.increaseCount());
